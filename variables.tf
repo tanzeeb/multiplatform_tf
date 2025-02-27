@@ -1,7 +1,6 @@
 variable "project_id" {
   description = "The GCP project ID"
   type        = string
-  default = "msinghi-experimental4"
 }
 
 variable "region" {
@@ -19,7 +18,7 @@ variable "zone" {
 variable "instance_name" {
   description = "Name for the GCE instance"
   type        = string
-  default = "msinghi-test"
+  default = "msinghi-test-new"
 }
 
 variable "machine_type" {
