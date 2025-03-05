@@ -33,36 +33,21 @@ variable "disk_size" {
   default = 10
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for instance access"
-  type        = string
-  default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLRkL7TEmx+8boZrartiWxr6NQdo9rMuQ/XIkRNm5uP mayanksinghi@gmail.com"
-}
-
-variable "ssh_user" {
-  description = "SSH user for instance access"
-  type        = string
-  default     = "admin"
-}
-
 variable "customer_name" {
   type = string
   description = "name of customer"
   default = "unknown"
 }
 
-variable "allowed_ip" {
-  description = "IP address allowed for SSH access (CIDR notation)"
-  type        = string
-  default = "50.35.69.244"
+variable "ssh_source_ranges" {
+  description = "CIDR blocks that can access the VM via SSH"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
-variable "login_user" {
-  type = string
-  default = "msinghi"
-}
-
-variable "login_password" {
-  type = string
-  default = "mypwd"
+# New variable to control whether to create default VPC
+variable "create_default_vpc" {
+  description = "Whether to create the default VPC if it doesn't exist"
+  type        = bool
+  default     = false
 }
