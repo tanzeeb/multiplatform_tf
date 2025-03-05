@@ -43,7 +43,7 @@ variable "customer_name" {
 variable "create_vpc" {
   description = "Whether to create the default VPC if it doesn't exist"
   type        = bool
-  default     = true
+  default     = false
 }
 
 # Variable for VPC name
