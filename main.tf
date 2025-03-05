@@ -1,9 +1,8 @@
-
 # Create the default VPC based on the variable
 resource "google_compute_network" "default_vpc" {
   # Only create if the variable is set to true
   count                   = var.create_default_vpc ? 1 : 0
-  name                    = "default"
+  name                    = var.vpc_name
   project                 = var.project_id
   auto_create_subnetworks = true
   description             = "Default VPC network"
@@ -17,7 +16,7 @@ resource "google_compute_network" "default_vpc" {
 # Create a firewall rule for SSH access
 resource "google_compute_firewall" "allow_ssh" {
   name    = "allow-ssh"
-  network = "default"
+  network = var.vpc_name
   project = var.project_id
 
   allow {

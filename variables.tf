@@ -51,3 +51,10 @@ variable "create_default_vpc" {
   type        = bool
   default     = false
 }
+
+# Variable for VPC name
+variable "vpc_name" {
+  description = "Name of the VPC network to use"
+  type        = string
+  default     = "default"
+}
