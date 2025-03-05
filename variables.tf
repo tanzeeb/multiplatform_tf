@@ -18,7 +18,7 @@ variable "zone" {
 variable "instance_name" {
   description = "Name for the GCE instance"
   type        = string
-  default = "msinghi-test-new"
+  default = "my-fancy-saas-vm"
 }
 
 variable "machine_type" {
@@ -39,17 +39,11 @@ variable "customer_name" {
   default = "unknown"
 }
 
-variable "ssh_source_ranges" {
-  description = "CIDR blocks that can access the VM via SSH"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
 # New variable to control whether to create default VPC
-variable "create_default_vpc" {
+variable "create_vpc" {
   description = "Whether to create the default VPC if it doesn't exist"
   type        = bool
-  default     = false
+  default     = true
 }
 
 # Variable for VPC name
