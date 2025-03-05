@@ -18,7 +18,7 @@ variable "zone" {
 variable "instance_name" {
   description = "Name for the GCE instance"
   type        = string
-  default = "msinghi-test-new"
+  default = "my-fancy-saas-vm"
 }
 
 variable "machine_type" {
@@ -33,36 +33,22 @@ variable "disk_size" {
   default = 10
 }
 
-variable "ssh_public_key" {
-  description = "SSH public key for instance access"
-  type        = string
-  default = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLRkL7TEmx+8boZrartiWxr6NQdo9rMuQ/XIkRNm5uP mayanksinghi@gmail.com"
-}
-
-variable "ssh_user" {
-  description = "SSH user for instance access"
-  type        = string
-  default     = "admin"
-}
-
 variable "customer_name" {
   type = string
   description = "name of customer"
   default = "unknown"
 }
 
-variable "allowed_ip" {
-  description = "IP address allowed for SSH access (CIDR notation)"
+# New variable to control whether to create default VPC
+variable "create_vpc" {
+  description = "Whether to create the default VPC if it doesn't exist"
+  type        = bool
+  default     = false
+}
+
+# Variable for VPC name
+variable "vpc_name" {
+  description = "Name of the VPC network to use"
   type        = string
-  default = "50.35.69.244"
-}
-
-variable "login_user" {
-  type = string
-  default = "msinghi"
-}
-
-variable "login_password" {
-  type = string
-  default = "mypwd"
+  default     = "default"
 }
