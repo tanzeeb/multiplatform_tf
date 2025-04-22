@@ -11,9 +11,52 @@ terraform {
   }
 }
 
+# Configure the Google provider in the root module
 provider "google" {
-  project = var.project_id # Define project_id in terraform.tfvars or via -var flag
-  region  = var.region     # Define region in terraform.tfvars or via -var flag
+  project = var.project_id
+  region  = var.region
+}
+
+# Configure the Kubernetes provider in the root module
+data "google_client_config" "default" {}
+
+provider "kubernetes" {
+  host                   = module.gke_cluster.cluster_endpoint
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(module.gke_cluster.cluster_ca_certificate)
+}
+
+# Instantiate the GKE Cluster Module
+module "gke_cluster" {
+  source = "./modules/gke_cluster"
+
+  # Pass standard variables
+  project_id = var.project_id
+  region     = var.region
+  zone       = var.zone
+  # ... other cluster variables ...
+
+  # Explicitly pass the provider configuration
+  providers = {
+    google = google # Pass the root module's google provider config
+  }
+}
+
+# Instantiate the Kubernetes Workload Module
+module "k8s_nginx_app" {
+  source = "./modules/k8s_workload"
+
+  # Pass standard variables
+  app_name     = "nginx-passed-provider"
+  app_replicas = 1
+
+  # Explicitly pass the provider configurations
+  providers = {
+    kubernetes = kubernetes # Pass the root module's k8s provider config
+    # google = google      # Pass google if the module needed it (e.g., for data sources)
+  }
+
+  depends_on = [module.gke_cluster]
 }
 
 # Define root variables (can be in variables.tf or passed via tfvars/command line)
@@ -28,42 +71,10 @@ variable "region" {
   default     = "us-central1"
 }
 
- variable "zone" {
+variable "zone" {
   description = "GCP Zone"
   type        = string
   default     = "us-central1-c" # Example zone
-}
-
-
-# Instantiate the GKE Cluster Module
-module "gke_cluster" {
-  source = "./modules/gke_cluster"
-
-  project_id   = var.project_id
-  region       = var.region
-  zone         = var.zone # Pass the zone to the cluster module
-  cluster_name = "my-split-cluster"
-  # Add other overrides if needed
-}
-
-# Instantiate the Kubernetes Workload Module
-module "k8s_nginx_app" {
-  source = "./modules/k8s_workload"
-
-  # Pass outputs from the cluster module as inputs here
-  cluster_endpoint        = module.gke_cluster.cluster_endpoint
-  cluster_ca_certificate  = module.gke_cluster.cluster_ca_certificate
-
-  # Configure the application
-  app_name     = "nginx-split-demo"
-  app_image    = "nginx:stable"
-  app_replicas = 2
-  service_type = "LoadBalancer"
-
-  # Ensure workload module runs after cluster module is complete
-  # Although Terraform usually infers this from variable passing,
-  # explicit dependency can be clearer.
-  depends_on = [module.gke_cluster]
 }
 
 # Output the Load Balancer IP from the workload module
@@ -73,6 +84,6 @@ output "application_load_balancer_ip" {
 }
 
 output "cluster_name" {
-    description = "Name of the GKE cluster created"
-    value = module.gke_cluster.cluster_name
+  description = "Name of the GKE cluster created"
+  value       = module.gke_cluster.cluster_name
 }

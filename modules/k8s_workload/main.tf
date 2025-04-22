@@ -1,16 +1,6 @@
-# Required for Kubernetes provider authentication using gcloud credentials
-data "google_client_config" "default" {}
-
-# Kubernetes Provider Configuration
-# Configures the Kubernetes provider to interact with the target GKE cluster.
-provider "kubernetes" {
-  host                   = "https://${var.cluster_endpoint}"
-  token                  = data.google_client_config.default.access_token
-  cluster_ca_certificate = base64decode(var.cluster_ca_certificate)
-}
-
 # Kubernetes Deployment Resource
 resource "kubernetes_deployment" "app" {
+  # No provider alias needed, uses the default passed from the caller.
   metadata {
     name = var.app_name
     labels = {
@@ -49,14 +39,15 @@ resource "kubernetes_deployment" "app" {
 }
 
 # Kubernetes Service Resource
-# Exposes the deployment based on the specified service type.
 resource "kubernetes_service" "app_service" {
+  # No provider alias needed, uses the default passed from the caller.
   metadata {
     name = "${var.app_name}-service"
   }
   spec {
     selector = {
-      app = kubernetes_deployment.app.metadata[0].labels.app
+      # Reference the deployment's label selector correctly
+      app = kubernetes_deployment.app.spec[0].selector[0].match_labels.app
     }
     port {
       port        = var.service_port
